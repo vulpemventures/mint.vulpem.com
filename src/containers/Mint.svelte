@@ -1,22 +1,57 @@
 <script lang="ts">
-  import ConfirmModal from '../components/ConfirmModal.svelte';
-  import { Status } from '../constants';
+import { BrowserInject, getUnblindURLFromTx, IdentityType, makeUnblindURL, TxInterface, UtxoInterface } from 'ldk';
+import { detectProvider } from 'marina-provider';
 
-  let showModal = false;
-  let modalStatus = Status.WAITING;
-  let error: string;
-  let txid: string;
+import ConfirmModal from '../components/ConfirmModal.svelte';
+import { Status } from '../constants';
+import { broadcastTransaction } from '../utils/broadcast';
+import { createContract, mintAsset } from '../utils/issuance';
 
-  let name: string;
-  let ticker: string;
-  let supply: number;
+let showModal = false;
+let modalStatus = Status.WAITING;
+let error: string;
 
-  const handleSubmit = () => {
-    console.log(name);
+let name: string;
+let ticker: string;
+let supply: number;
 
-    // use name, ticker and assetAmount
-    //issueAsset(networks.liquid)(greedyCoinSelector())()
-  };
+let explorerLink: string;
+
+const marinaIdentity = (chain: 'liquid' | 'regtest') => new BrowserInject({
+  chain,
+  type: IdentityType.Inject,
+  opts: {
+    windowProvider: 'marina',
+  },
+});
+
+
+const handleSubmit = async () => {
+  try {
+    showModal = true;
+    modalStatus = Status.WAITING;
+
+    const marina = await detectProvider('marina');
+  
+    const utxos = await marina.getCoins();
+    const chain = await marina.getNetwork();
+
+    const signedHex = await mintAsset(
+      marinaIdentity(chain),
+      utxos as UtxoInterface[],
+      chain,
+      supply,
+      createContract(name, ticker),
+    )
+
+    const txid = await broadcastTransaction(chain, signedHex);
+    explorerLink = `https://liquid.network/tx/${txid}`
+    modalStatus = Status.COMPLETED;
+  } catch (e) {
+    modalStatus = Status.ERROR;
+    console.error(e)
+  }
+};
 </script>
 
 <form class="box">
@@ -60,4 +95,4 @@
   </div>
   <button type="button" class="button" on:click={handleSubmit}>Mint</button>
 </form>
-<ConfirmModal bind:active={showModal} status={modalStatus} {txid} {error} />
+<ConfirmModal bind:active={showModal} status={modalStatus} {explorerLink} {error} />

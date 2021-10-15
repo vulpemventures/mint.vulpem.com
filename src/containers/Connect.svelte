@@ -43,11 +43,11 @@
     }
 
     // Start listening to ENABLED and DISABLED events and binds to the state
-    await marina.on('ENABLED', () => {
+    marina.on('ENABLED', () => {
       notifyEnabled();
     });
 
-    await marina.on('DISABLED', () => {
+    marina.on('DISABLED', () => {
       notifyDisabled();
     });
   });

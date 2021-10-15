@@ -5,7 +5,7 @@
 
   export let active: boolean;
 
-  export let txid: string;
+  export let explorerLink: string;
   export let error: string;
 
   export let status: Status;
@@ -36,7 +36,7 @@
             <h1 class="title is-3 has-text-white">Issuance Submitted</h1>
             <a
               target="_blank"
-              href={'https://blockstream.info/liquid/tx/' + txid}
+              href={explorerLink}
             >
               <p class="subtitle">View on Explorer</p>
             </a>
