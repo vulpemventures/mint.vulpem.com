@@ -41,6 +41,7 @@
     "format": "npx prettier --write src/**/*.svelte"
   },
   "dependencies": {
+    "axios": "^0.23.0",
     "bulma": "^0.9.3",
     "ldk": "^0.3.13",
     "liquidjs-lib": "^5.2.2",
