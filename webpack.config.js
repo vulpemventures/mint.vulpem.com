@@ -69,6 +69,10 @@ module.exports = {
 				resolve: {
 					fullySpecified: false
 				}
+			},
+			{
+				test: /\.(jpg|jpeg|png|svg)$/,
+				use: 'file-loader',
 			}
 		]
 	},
